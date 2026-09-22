@@ -1,0 +1,20 @@
+{
+  "name": "ds-club-scavenger-hunt",
+  "version": "1.0.1",
+  "description": "Secure QR-based scavenger hunt backend",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "build": "npm install",
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.1",
+    "express": "^4.19.2",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}

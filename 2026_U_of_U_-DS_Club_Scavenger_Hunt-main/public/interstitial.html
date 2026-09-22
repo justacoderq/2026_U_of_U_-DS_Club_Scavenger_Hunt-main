@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Next Location</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="icon" href="/assets/images/SCClubLogo.png" type="image/x-icon" />
+</head>
+
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="header-left">
+        <img src="/assets/images/SCClubLogo.png" alt="DS Club Logo" class="club-logo" />
+        <div class="club-name">
+            The Data Science Club<br />
+            <span class="subtext">at the University of Utah</span>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <button class="menu-toggle" id="menuBtn">&#9776;</button>
+        <nav class="menu" id="menuDropdown">
+            <a href="/leaderboard.html">Leaderboard</a>
+            <a href="/prizes.html">Prizes</a>
+            <a href="https://discord.gg/k7vP4fjRY7" target="_blank" rel="noopener noreferrer">Discord</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <section class="overview">
+        <h1>📍 Your Next Destination</h1>
+        <p id="clueText">Loading clue...</p>
+
+        <p style="margin-top: 1rem; font-weight:600;">
+            Scan the next QR code at this location to continue.
+        </p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="https://campusconnect.utah.edu/feeds?type=club&type_id=36352&tab=about"
+           class="footer-link"
+           target="_blank"
+           rel="noopener noreferrer">
+            Campus Connect
+        </a>
+        <a href="https://discord.gg/k7vP4fjRY7" class="footer-link" target="_blank" rel="noopener noreferrer">Discord</a>
+    </div>
+    <p class="footer-note">All contact info deleted after the event.</p>
+</footer>
+
+<script src="/js/interstitial.js" defer></script>
+<script src="/js/menu.js" defer></script>
+</body>
+</html>

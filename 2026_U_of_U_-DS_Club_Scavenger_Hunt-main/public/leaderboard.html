@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="icon" href="/assets/images/SCClubLogo.png" type="image/x-icon" />
+</head>
+
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="header-left">
+        <img src="/assets/images/SCClubLogo.png" alt="DS Club Logo" class="club-logo" />
+        <div class="club-name">
+            The Data Science Club<br />
+            <span class="subtext">at the University of Utah</span>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <button class="menu-toggle" id="menuBtn">&#9776;</button>
+        <nav class="menu" id="menuDropdown">
+            <a href="/index.html">Home</a>
+            <a href="/prizes.html">Prizes</a>
+            <a href="https://discord.gg/k7vP4fjRY7" target="_blank" rel="noopener noreferrer">Discord</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Main -->
+<main>
+    <section class="overview" style="max-width: 800px;">
+        <h1>🏆 Leaderboard</h1>
+        <p>Times are ranked from fastest to slowest.</p>
+
+        <div id="leaderboardContainer" style="margin-top: 1rem;">
+            <p>Loading leaderboard...</p>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-links">
+        <a href="https://campusconnect.utah.edu/feeds?type=club&type_id=36352&tab=about"
+           class="footer-link"
+           target="_blank"
+           rel="noopener noreferrer">
+            Campus Connect
+        </a>
+
+        <a href="https://discord.gg/k7vP4fjRY7" class="footer-link" target="_blank" rel="noopener noreferrer">Discord</a>
+    </div>
+    <p class="footer-note">All contact information will be deleted after the event.</p>
+</footer>
+
+<!-- Leaderboard script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadLeaderboard();
+    });
+
+    async function loadLeaderboard() {
+        const container = document.getElementById("leaderboardContainer");
+
+        try {
+            const res = await fetch("/api/leaderboard");
+            const teams = await res.json();
+
+            if (!res.ok || teams.length === 0) {
+                container.innerHTML = "<p>No completed teams yet.</p>";
+                return;
+            }
+
+            let html = `
+          <table style="width:100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background:#f2f2f2;">
+                <th style="padding: 10px; border-bottom: 2px solid #ddd;">Rank</th>
+                <th style="padding: 10px; border-bottom: 2px solid #ddd;">Team</th>
+                <th style="padding: 10px; border-bottom: 2px solid #ddd;">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+            teams.forEach((t, i) => {
+                const minutes = ((t.endTime - t.startTime) / 60000).toFixed(2);
+                html += `
+            <tr>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${i + 1}</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${t.teamName}</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${minutes} min</td>
+            </tr>
+          `;
+            });
+
+            html += "</tbody></table>";
+            container.innerHTML = html;
+
+        } catch (err) {
+            container.innerHTML = "<p>Error loading leaderboard.</p>";
+            console.error(err);
+        }
+    }
+</script>
+
+<!-- Shared Menu Script -->
+<script src="/js/menu.js" defer></script>
+
+</body>
+</html>

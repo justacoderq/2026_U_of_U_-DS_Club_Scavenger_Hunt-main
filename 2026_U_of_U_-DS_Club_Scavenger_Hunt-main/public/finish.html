@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hunt Completed!</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="icon" href="/assets/images/SCClubLogo.png" type="image/x-icon" />
+</head>
+
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="header-left">
+        <img
+                src="/assets/images/SCClubLogo.png"
+                alt="DS Club Logo"
+                class="club-logo"
+        />
+        <div class="club-name">
+            The Data Science Club<br />
+            <span class="subtext">at the University of Utah</span>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <button class="menu-toggle" id="menuBtn">&#9776;</button>
+        <nav class="menu" id="menuDropdown">
+            <a href="/leaderboard.html">Leaderboard</a>
+            <a href="/prizes.html">Prizes</a>
+            <a href="https://discord.gg/k7vP4fjRY7" target="_blank" rel="noopener noreferrer">Join Our Discord</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Main -->
+<main>
+    <section class="overview" id="finishContent">
+        <h1>🎉 Congratulations!</h1>
+        <p>
+            Team <strong id="teamName"></strong>, you’ve completed the Scavenger Hunt!
+        </p>
+        <p>Your total time: <strong id="timeTaken"></strong></p>
+        <p>Thank you for participating - we hope you had fun! Come see us at the check in table for a prize!</p>
+        <div style="margin-top: 20px;">
+            <a href="index.html" class="start-btn">Return to Home</a>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-links">
+        <a href="https://campusconnect.utah.edu/feeds?type=club&type_id=36352&tab=about"
+           class="footer-link"
+           target="_blank"
+           rel="noopener noreferrer">
+            Campus Connect
+        </a>
+
+        <a href="https://discord.gg/k7vP4fjRY7" class="footer-link" target="_blank" rel="noopener noreferrer">Discord</a>
+    </div>
+    <p class="footer-note">All contact information will be deleted after the event.</p>
+</footer>
+
+<!-- Finish Page Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const teamData = JSON.parse(localStorage.getItem('teamData'));
+
+        if (!teamData || !teamData.teamName) {
+            document.getElementById('finishContent').innerHTML =
+                "<p>Team data missing. Return to the home page.</p>";
+            return;
+        }
+
+        // Fetch server final time
+        const res = await fetch('/api/leaderboard');
+        const leaderboard = await res.json();
+
+        const entry = leaderboard.find(t => t.teamName === teamData.teamName);
+
+        if (!entry) {
+            document.getElementById('finishContent').innerHTML =
+                "<p>Could not retrieve your team result.</p>";
+            return;
+        }
+
+        const minutes = ((entry.endTime - entry.startTime) / 60000).toFixed(2);
+
+        document.getElementById('teamName').textContent = entry.teamName;
+        document.getElementById('timeTaken').textContent = `${minutes} minutes`;
+    });
+</script>
+
+
+<!-- Shared Menu Script -->
+<script src="/js/menu.js" defer></script>
+
+</body>
+</html>

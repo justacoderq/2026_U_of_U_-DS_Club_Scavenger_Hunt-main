@@ -1,0 +1,86 @@
+{
+  "a9d8f7": {
+    "route": "route1",
+    "stage": 1,
+    "clue": "Done with lab 3225? Take a break, check the boards and grab a drink for your sake.",
+    "keywords": ["building", "tall"],
+    "_location": "on the board by water fountain next to the std cs lab 3225"
+  },
+  "b3p9xk": {
+    "route": "route1",
+    "stage": 2,
+    "clue": "On the 2nd floor, if you dare, look for a spot within round tables and chairs, where quiet minds solve all their affairs.",
+    "keywords": ["statue", "west"],
+    "_location": "Study Session area 3rd floor"
+  },
+  "c8d2lz": {
+    "route": "route1",
+    "stage": 3,
+    "clue": "There’s a tunnel from WEB to MEB if you know where to tramp. Your next clue’s waiting right nearby—look beside the access ramp.",
+    "keywords": ["fountain", "water"],
+    "_location": "On the support pillar for the disability ramp in the WEB/MEB tunnel"
+  },
+  "syWtlm": {
+    "route": "route1",
+    "stage": 4,
+    "clue": "The final clue is not child's play, at the base of MEB(First floor), in a back corner far away. This room is radioactive DON'T GO INSIDE, for there are things requiring you to wash your eye",
+    "keywords": ["statue", "west"],
+    "_location": "Eyewash outside the radioactive room, 1st floor, next to room 1890"
+  },
+  "rXe5WW": {
+    "route": "route2",
+    "stage": 1,
+    "clue": "Don't run up the entrance stairs yet, here's your first clue, the code you seek is stashed on the stairway between floors 1 and 2",
+    "keywords": ["statue", "west"],
+    "_location": "In between the stairway, 1st->2nd floor"
+  },
+  "f4J35o": {
+    "route": "route2",
+    "stage": 2,
+    "clue": "Park at MEB, then step inside, the info board’s there, just to your left side.",
+    "keywords": ["statue", "west"],
+    "_location": "Poster board left of MEB parking lot entrance"
+  },
+  "q4pqGC": {
+    "route": "route2",
+    "stage": 3,
+    "clue": "Calculators, breadboards, and ECE gear, inside MEB, your supplies are near.",
+    "keywords": ["statue", "west"],
+    "_location": "Outside the ECE stock room"
+  },
+  "PVxmWb": {
+    "route": "route2",
+    "stage": 4,
+    "clue": "In CS our need for paper is very thin. Logically so for the recycling bin. Somewhere on the 2rd floor, lies a place, a collection of bins, the next stop in this race.",
+    "keywords": ["statue", "west"],
+    "_location": "That weird recycling can/vending machine cubby on the second floor, straight ahead from main stairway(down left hallway, n the right)"
+  },
+  "Vi05bE": {
+    "route": "route3",
+    "stage": 1,
+    "clue": "Your first code is not hidden in a small compartment, it's right outside the computing department.",
+    "keywords": ["statue", "west"],
+    "_location": "THE CS office, 3190"
+  },
+  "cjX2RD": {
+    "route": "route3",
+    "stage": 2,
+    "clue": "Struggling in class may hurt your pride, the place you must go is where Tutors/TAs reside",
+    "keywords": ["statue", "west"],
+    "_location": "TA lab"
+  },
+  "DKNW43": {
+    "route": "route3",
+    "stage": 3,
+    "clue": "For us undergrads, there is a lounge, the clue is outside, no need to scrounge",
+    "keywords": ["statue", "west"],
+    "_location": "Outside Undergrad Student lounge"
+  },
+  "f1Xtbm": {
+    "route": "route3",
+    "stage": 4,
+    "clue": "When you finish lab (3225), you might want moisturizer, the closest thing we have is hand sanitizer",
+    "keywords": ["statue", "west"],
+    "_location": "The sanitizer outside THE CS lab, 3225, next to the second door"
+  }
+}

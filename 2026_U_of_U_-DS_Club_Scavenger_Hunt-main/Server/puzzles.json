@@ -1,0 +1,86 @@
+[
+  {
+    "route": 1,
+    "stage": 1,
+    "question": "Decide which curve shows underfitting",
+    "hint": "Compare train vs validation error and the gap between them",
+    "answer": "A"
+  },
+  {
+    "route": 1,
+    "stage": 2,
+    "question": "Decode the message: 01100100 01100001 01110100 01100001",
+    "hint": "Each chunk of 8 bits is a byte, each byte can be represented as an ascii character",
+    "answer": "data"
+  },
+  {
+    "route": 1,
+    "stage": 3,
+    "question": "Unscramble “TAAD IS ETH NWE OLI",
+    "hint": "Look for short words first",
+    "answer": "Data is the new oil"
+  },
+  {
+    "route": 1,
+    "stage": 4,
+    "question": "You have a basic linear model, y = 12x - 45. Use the model to predict y with an input x=4",
+    "hint": "This is just straight up plug and play...",
+    "answer": "3"
+  },
+  {
+    "route": 2,
+    "stage": 1,
+    "question": "What is the primary data structure called in the Pandas Library (python)?",
+    "hint": "df.head(); one word",
+    "answer": "Dataframe"
+  },
+  {
+    "route": 2,
+    "stage": 2,
+    "question": "Of the 4 plots on the poster, which has the largest positive correlation (1, 2, 3 or 4)",
+    "hint": "Look for points tightly clustered along a positive slope",
+    "answer": "1"
+  },
+  {
+    "route": 2,
+    "stage": 3,
+    "question": "Where data climbs higher, combine the mean and median of [20,22,25,25,25,27]",
+    "hint": "Sum and divide for mean; sort and pick middle for median",
+    "answer": "49"
+  },
+  {
+    "route": 2,
+    "stage": 4,
+    "question": "You have 100 data points to work with. If you do 5-fold cross-validation (each fold is 20/80 split), how many of your datapoints get tested?",
+    "hint": "In cross-validation, data is split into folds, which all take turns being training and testing data",
+    "answer": "100"
+  },
+  {
+    "route": 3,
+    "stage": 1,
+    "question": "A point has neighbors of labels (in order of closest to most distant): [blue, red, blue, red, red, green, green, green, green]. What will it be approximated under k=5 nearest neighbors?",
+    "hint": "KNN algorithm uses majority rule on its nearest neighbors",
+    "answer": "Red"
+  },
+  {
+    "route": 3,
+    "stage": 2,
+    "question": "What kind of regularization (L_), uses the Euclidean distance(c = sqrt(A^2 + B^2))",
+    "hint": "2 character answer, will start with an L, then a number",
+    "answer": "L2"
+  },
+  {
+    "route": 3,
+    "stage": 3,
+    "question": "Write a SQL query for our very HIPAA-compliant database. This query should get columns 'Age' and 'SSN' from our table Users",
+    "hint": "You will only need actions SELECT and FROM, don't forget the ;",
+    "answer": "SELECT Age, SSN FROM Users;"
+  },
+  {
+    "route": 3,
+    "stage": 4,
+    "question": "I'm the size of each step you take toward the bottom of a slope...What am I?",
+    "hint": "2-word answer. It's a hyperparameter named after how big the steps are",
+    "answer": "Learning rate"
+  }
+]

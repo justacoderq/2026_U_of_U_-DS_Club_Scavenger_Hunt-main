@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scavenger Hunt - Stage Clue</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <!-- Load scripts: routes.js first, then validator.js -->
+    <script src="../../js/routes.js" defer></script>
+    <script src="../../js/validator.js" defer></script>
+</head>
+<body>
+<!-- Persistent Header -->
+<header class="header">
+    <div class="header-left">
+        <img src="../../../assets/images/SCClubLogo.png" alt="DS Club Logo" class="club-logo">
+        <div class="club-name">
+            The Data Science Club<br>
+            <span class="subtext">at the University of Utah</span>
+        </div>
+    </div>
+    <div class="header-right">
+        <button class="menu-toggle" id="menuBtn">&#9776;</button>
+        <nav class="menu" id="menuDropdown">
+            <a href="#">Leaderboard</a>
+            <a href="#">Prizes</a>
+            <a href="#">More Info</a>
+            <a href="https://discord.gg/k7vP4fjRY7" target="_blank" rel="noopener noreferrer">Join Our Discord</a>
+            <a href="#">Disclaimers</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <section class="overview">
+        <h1 id="clue-title">Loading...</h1>
+        <p id="clue-text">Loading clue...</p>
+
+        <form id="clueForm">
+            <label for="teamName">Team Name:</label>
+            <input type="text" id="teamName" placeholder="Enter your team name" required>
+
+            <label for="answerInput">Your Answer:</label>
+            <input type="text" id="answerInput" placeholder="Enter your answer" required>
+
+            <p id="errorMsg" style="color:red; font-weight:500; display:none;">Incorrect, try again!</p>
+
+            <button type="submit" class="start-btn">Submit Answer</button>
+        </form>
+
+        <!-- DEV button (optional; safe for testing only) -->
+        <button id="devBtn" style="margin-top:20px;" class="start-btn">Dev: Skip to Next</button>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="#" class="footer-link">Campus Connect</a>
+        <a href="https://discord.gg/k7vP4fjRY7" class="footer-link" target="_blank" rel="noopener noreferrer">Discord</a>
+    </div>
+    <p class="footer-note">All contact information will be deleted after the event.</p>
+</footer>
+</body>
+</html>

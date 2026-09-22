@@ -1,0 +1,16 @@
+{
+  "teams": [
+    {
+      "teamName": "admin",
+      "contact": "email",
+      "startTime": 1714094712000,
+      "endTime": null,
+      "stages": {
+        "1": 1714094730000,
+        "2": 1714094805000,
+        "3": 1714094920000,
+        "4": null
+      }
+    }
+  ]
+}

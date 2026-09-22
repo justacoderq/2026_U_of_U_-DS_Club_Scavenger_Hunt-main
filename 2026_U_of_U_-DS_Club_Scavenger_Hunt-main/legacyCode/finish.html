@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunt Completed!</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Persistent Header -->
+<header class="header">
+    <div class="header-left">
+        <img src="../assets/images/SCClubLogo.png" alt="DS Club Logo" class="club-logo">
+        <div class="club-name">
+            The Data Science Club<br>
+            <span class="subtext">at the University of Utah</span>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <button class="menu-toggle" id="menuBtn">&#9776;</button>
+        <nav class="menu" id="menuDropdown">
+            <a href="#">Leaderboard</a>
+            <a href="#">Prizes</a>
+            <a href="#">More Info</a>
+            <a href="https://discord.gg/k7vP4fjRY7" target="_blank" rel="noopener noreferrer">Join Our Discord</a>
+            <a href="#">Disclaimers</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <section class="overview" id="finishContent">
+        <h1>🎉 Congratulations!</h1>
+        <p>Team <strong id="teamName"></strong>, you’ve completed the Scavenger Hunt!</p>
+        <p>Your total time: <strong id="timeTaken"></strong></p>
+        <p>Thank you for participating — we hope you had fun!</p>
+        <a href="index.html" class="start-btn">Return to Home</a>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-links">
+        <a href="#" class="footer-link">Campus Connect</a>
+        <a href="https://discord.gg/k7vP4fjRY7" class="footer-link" target="_blank" rel="noopener noreferrer">Discord</a>
+    </div>
+    <p class="footer-note">All contact information will be deleted after the event.</p>
+</footer>
+
+<script>
+    // Stable dropdown toggle
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.getElementById("menuBtn");
+        const menuDropdown = document.getElementById("menuDropdown");
+
+        menuBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            menuDropdown.style.display = menuDropdown.style.display === "flex" ? "none" : "flex";
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!menuDropdown.contains(event.target) && !menuBtn.contains(event.target)) {
+                menuDropdown.style.display = "none";
+            }
+        });
+
+        // Finish page logic
+        const teamData = JSON.parse(localStorage.getItem("teamData"));
+        if (!teamData || !teamData.startTime) {
+            document.getElementById("finishContent").innerHTML =
+                "<p>Team data not found. Please return to the start page.</p>";
+            return;
+        }
+
+        const totalTime = ((Date.now() - teamData.startTime) / 60000).toFixed(2);
+        document.getElementById("teamName").textContent = teamData.teamName;
+        document.getElementById("timeTaken").textContent = `${totalTime} minutes`;
+    });
+</script>
+</body>
+</html>

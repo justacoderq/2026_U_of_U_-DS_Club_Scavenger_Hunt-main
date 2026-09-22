@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .admin-box {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            margin-top: 1rem;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-box">
+    <h2>Administrator Panel</h2>
+
+    <div>
+        <p>Enter password:</p>
+        <input type="password" id="adminKey" placeholder="Password">
+        <button onclick="loadTeams()">Unlock</button>
+    </div>
+
+    <div id="teamContainer" style="margin-top: 20px;"></div>
+</div>
+
+<script>
+    let ADMIN_KEY = "";
+
+    async function loadTeams() {
+        ADMIN_KEY = document.getElementById("adminKey").value;
+
+        if (!ADMIN_KEY) {
+            return alert("Enter password");
+        }
+
+        const res = await fetch("/secret/admin/teams", {
+            headers: { "x-admin-key": ADMIN_KEY }
+        });
+
+        if (!res.ok) {
+            return alert("Wrong password");
+        }
+
+        const data = await res.json();
+        renderTeams(data.teams);
+    }
+
+    function renderTeams(teams) {
+        let html = `
+        <table>
+            <tr>
+                <th>Team</th>
+                <th>Contact</th>
+                <th>Route</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Stages</th>
+                <th>Actions</th>
+            </tr>
+    `;
+
+        for (const t of teams) {
+            const stageList =
+                t.stages ? Object.entries(t.stages)
+                    .map(([s, time]) => `Stage ${s}: ${time}`)
+                    .join("<br>") : "None";
+
+            html += `
+            <tr>
+                <td>${t.teamName}</td>
+                <td>${t.contact}</td>
+                <td>${t.route || "?"}</td>
+                <td>${t.startTime}</td>
+                <td>${t.endTime ?? "null"}</td>
+                <td>${stageList}</td>
+                <td>
+                    <button class="btn-small" onclick="editTeam('${t.teamName}')">Edit</button>
+                    <button class="btn-small" onclick="deleteTeam('${t.teamName}')">Delete</button>
+                </td>
+            </tr>
+        `;
+        }
+
+        html += "</table>";
+
+        document.getElementById("teamContainer").innerHTML = html;
+    }
+
+    function deleteTeam(teamName) {
+        if (!confirm("Delete team: " + teamName + "?")) return;
+
+        fetch("/secret/admin/delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-admin-key": ADMIN_KEY
+            },
+            body: JSON.stringify({ teamName })
+        })
+            .then(r => r.json())
+            .then(d => {
+                if (d.error) return alert("Error: " + d.error);
+                alert("Team deleted");
+                loadTeams();
+            });
+    }
+
+    function editTeam(teamName) {
+        const field = prompt("Enter field to update (e.g. endTime, route, contact)");
+        if (!field) return;
+
+        const val = prompt("Enter new value");
+        if (val === null) return;
+
+        let parsed = val;
+        if (!isNaN(val) && val.trim() !== "") parsed = Number(val);
+
+        fetch("/secret/admin/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-admin-key": ADMIN_KEY
+            },
+            body: JSON.stringify({ teamName, updates: { [field]: parsed } })
+        })
+            .then(r => r.json())
+            .then(d => {
+                if (d.error) return alert("Error: " + d.error);
+                alert("Updated");
+                loadTeams();
+            });
+    }
+</script>
+
+</body>
+</html>
