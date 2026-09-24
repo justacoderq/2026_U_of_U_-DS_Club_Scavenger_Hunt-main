@@ -1,2 +1,5 @@
 *node_modules
 Server/processLog.json
+.vercel
+.env*
+.DS_Store

@@ -13,8 +13,6 @@ let tokenMap = {};
 if (fs.existsSync(TOKEN_MAP_PATH)) {
   tokenMap = JSON.parse(fs.readFileSync(TOKEN_MAP_PATH, 'utf8'));
 }
-console.log(TOKEN_MAP_PATH);
-console.log(tokenMap);
 
 // ==============================
 // Serve stage.html for QR tokens

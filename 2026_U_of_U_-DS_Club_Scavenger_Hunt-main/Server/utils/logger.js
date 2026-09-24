@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { LOG_PATH } from '../utils/config.js';
+import { LOG_PATH, ON_VERCEL } from '../utils/config.js';
 
 const logEvent = (token, event, team = 'unknown') => {
   const logEntry = {
@@ -8,6 +8,12 @@ const logEvent = (token, event, team = 'unknown') => {
     event,
     timestamp: new Date().toISOString(),
   };
+
+  // Vercel's filesystem is read-only; its runtime logs capture console output instead
+  if (ON_VERCEL) {
+    console.log(JSON.stringify(logEntry));
+    return;
+  }
 
   let logData = [];
   if (fs.existsSync(LOG_PATH)) {

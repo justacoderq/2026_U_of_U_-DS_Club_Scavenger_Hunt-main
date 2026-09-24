@@ -62,6 +62,10 @@
         loadLeaderboard();
     });
 
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    }
+
     async function loadLeaderboard() {
         const container = document.getElementById("leaderboardContainer");
 
@@ -91,7 +95,7 @@
                 html += `
             <tr>
               <td style="padding: 10px; border-bottom: 1px solid #ddd;">${i + 1}</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${t.teamName}</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${escapeHtml(t.teamName)}</td>
               <td style="padding: 10px; border-bottom: 1px solid #ddd;">${minutes} min</td>
             </tr>
           `;

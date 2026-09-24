@@ -7,14 +7,17 @@
   "scripts": {
     "build": "npm install",
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "qr": "node scripts/generateQR.js"
   },
   "dependencies": {
+    "@upstash/redis": "^1.39.0",
     "compression": "^1.8.1",
     "express": "^4.19.2",
     "morgan": "^1.10.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.3"
+    "nodemon": "^3.0.3",
+    "qrcode": "^1.5.4"
   }
 }

@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const teamName = document.getElementById("teamName").value.trim();
         const contactInfo = document.getElementById("contactInfo").value.trim();
+        const password = document.getElementById("huntPassword").value;
 
         if (!teamName || !selectedRoute) {
             alert("Please enter a team name and select a route.");
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const regRes = await fetch("/api/team/start", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ teamName, contact: contactInfo })
+                body: JSON.stringify({ teamName, contact: contactInfo, password, route: selectedRoute })
             });
 
             backendTeam = await regRes.json();

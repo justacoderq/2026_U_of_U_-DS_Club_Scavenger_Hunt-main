@@ -1,0 +1,7 @@
+node_modules
+/Server/node_modules
+/Server/teams.json
+/Server/processLog.json
+/legacyCode
+/admin
+/assets

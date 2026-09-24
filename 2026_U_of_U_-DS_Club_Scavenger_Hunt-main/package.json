@@ -1,0 +1,15 @@
+{
+  "name": "ds-club-scavenger-hunt-vercel",
+  "private": true,
+  "description": "Vercel deployment wrapper; local development still runs from Server/",
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.39.0",
+    "compression": "^1.8.1",
+    "express": "^4.19.2",
+    "morgan": "^1.10.1"
+  }
+}

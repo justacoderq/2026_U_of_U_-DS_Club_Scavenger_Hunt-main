@@ -1,36 +1,21 @@
 import path from 'path';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
 
-// Detect if running on Render
-const ON_RENDER = !!process.env.RENDER_SERVICE_ID;
+// Resolve paths from this file, not process.cwd(), so they work both
+// locally (npm start from Server/) and on Vercel (cwd is the project root)
+const SERVER_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const ROOT_DIR = path.join(SERVER_DIR, '..');
 
-// Determine base directory for data files
-// Local: use Server dir
-// Render: use persistent disk
-const SERVER_DIR = process.cwd();
-const DATA_DIR = ON_RENDER ? "/var/data" : SERVER_DIR;
+const ON_VERCEL = !!process.env.VERCEL;
 
-// Make sure the directory exists (especially on Render)
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// Existing paths
-const ROOT_DIR = path.join(SERVER_DIR, '../');
 const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 const TOKEN_MAP_PATH = path.join(SERVER_DIR, 'tokenMap.json');
-const LOG_PATH = path.join(DATA_DIR, 'processLog.json');
+const PUZZLES_PATH = path.join(SERVER_DIR, 'puzzles.json');
 
-// NEW: Teams storage
-const TEAMS_PATH = path.join(DATA_DIR, 'teams.json');
-
-// Initialize teams file if it doesn't exist
-if (!fs.existsSync(TEAMS_PATH)) {
-    console.log("Initializing teams.json at:", TEAMS_PATH);
-    fs.writeFileSync(TEAMS_PATH, JSON.stringify({ teams: [] }, null, 2));
-}
+// Local-only data files (on Vercel, teams live in Redis and logs go to the console)
+const LOG_PATH = path.join(SERVER_DIR, 'processLog.json');
+const TEAMS_PATH = path.join(SERVER_DIR, 'teams.json');
 
 const PORT = process.env.PORT || 8080;
 
-export { PUBLIC_DIR, TOKEN_MAP_PATH, LOG_PATH, TEAMS_PATH, PORT };
+export { ON_VERCEL, PUBLIC_DIR, TOKEN_MAP_PATH, PUZZLES_PATH, LOG_PATH, TEAMS_PATH, PORT };

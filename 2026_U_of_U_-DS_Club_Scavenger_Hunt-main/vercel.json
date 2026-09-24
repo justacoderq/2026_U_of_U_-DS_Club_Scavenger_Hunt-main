@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index" },
+    { "source": "/qr/:path*", "destination": "/api/index" },
+    { "source": "/secret/:path*", "destination": "/api/index" }
+  ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "{Server/tokenMap.json,Server/puzzles.json,public/stage.html}"
+    }
+  }
+}

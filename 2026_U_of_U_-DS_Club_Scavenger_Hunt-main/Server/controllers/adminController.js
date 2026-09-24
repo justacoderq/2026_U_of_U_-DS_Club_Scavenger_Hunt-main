@@ -1,5 +1,4 @@
-import fs from "fs";
-import { TEAMS_PATH } from "../utils/config.js";
+import { listTeams, getTeam, saveTeam, deleteTeam } from "../utils/teamStore.js";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
@@ -10,16 +9,15 @@ function checkAuth(req) {
 }
 
 // GET all teams
-export function adminGetTeams(req, res) {
+export async function adminGetTeams(req, res) {
     if (!checkAuth(req)) {
         return res.status(403).json({ error: "Unauthorized" });
     }
 
     try {
-        const raw = fs.readFileSync(TEAMS_PATH, "utf8");
-        const data = JSON.parse(raw);
+        const teams = await listTeams();
         res.setHeader("Cache-Control", "no-store");
-        res.json(data);
+        res.json({ teams });
     } catch (err) {
         console.error("Error reading teams:", err);
         res.status(500).json({ error: "Could not read team data" });
@@ -27,7 +25,7 @@ export function adminGetTeams(req, res) {
 }
 
 // DELETE a team by name
-export function adminDeleteTeam(req, res) {
+export async function adminDeleteTeam(req, res) {
     if (!checkAuth(req)) {
         return res.status(403).json({ error: "Unauthorized" });
     }
@@ -39,17 +37,11 @@ export function adminDeleteTeam(req, res) {
     }
 
     try {
-        const raw = fs.readFileSync(TEAMS_PATH, "utf8");
-        const data = JSON.parse(raw);
+        const removed = await deleteTeam(teamName);
 
-        const before = data.teams.length;
-        data.teams = data.teams.filter(t => t.teamName !== teamName);
-
-        if (data.teams.length === before) {
+        if (!removed) {
             return res.status(404).json({ error: "Team not found" });
         }
-
-        fs.writeFileSync(TEAMS_PATH, JSON.stringify(data, null, 2));
 
         res.json({ success: true });
     } catch (err) {
@@ -59,7 +51,7 @@ export function adminDeleteTeam(req, res) {
 }
 
 // UPDATE arbitrary fields
-export function adminUpdateTeam(req, res) {
+export async function adminUpdateTeam(req, res) {
     if (!checkAuth(req)) {
         return res.status(403).json({ error: "Unauthorized" });
     }
@@ -70,18 +62,18 @@ export function adminUpdateTeam(req, res) {
         return res.status(400).json({ error: "Missing fields" });
     }
 
-    try {
-        const raw = fs.readFileSync(TEAMS_PATH, "utf8");
-        const data = JSON.parse(raw);
+    // The team name is the storage key, so it can't be edited in place
+    delete updates.teamName;
 
-        const team = data.teams.find(t => t.teamName === teamName);
+    try {
+        const team = await getTeam(teamName);
         if (!team) {
             return res.status(404).json({ error: "Team not found" });
         }
 
         Object.assign(team, updates);
 
-        fs.writeFileSync(TEAMS_PATH, JSON.stringify(data, null, 2));
+        await saveTeam(team);
         res.json({ success: true, team });
     } catch (err) {
         console.error("Error updating team:", err);

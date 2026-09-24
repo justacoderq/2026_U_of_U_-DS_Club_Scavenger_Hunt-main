@@ -2,17 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <link rel="stylesheet" href="/css/style.css">
 
     <style>
         .admin-box {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 2rem auto;
             padding: 1.5rem;
             background: white;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .table-wrap {
+            overflow-x: auto;
         }
         table {
             width: 100%;
@@ -24,11 +28,48 @@
             padding: 8px;
             border-bottom: 1px solid #ccc;
             text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #f2f2f2;
+            white-space: nowrap;
+        }
+        .num {
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .total {
+            font-weight: 700;
+        }
+        .splits {
+            font-size: 0.8rem;
+            color: #555;
+            white-space: nowrap;
+        }
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .status.finished { background: #d9f2df; color: #1d6b32; }
+        .status.playing  { background: #fff1cc; color: #7a5a00; }
+        .status.waiting  { background: #eee;    color: #555; }
+        .summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #555;
         }
         .btn-small {
             padding: 4px 8px;
             font-size: 0.8rem;
-            margin-right: 4px;
+            margin: 0 4px 4px 0;
         }
     </style>
 </head>
@@ -38,17 +79,66 @@
 <div class="admin-box">
     <h2>Administrator Panel</h2>
 
-    <div>
+    <div id="loginBox">
         <p>Enter password:</p>
         <input type="password" id="adminKey" placeholder="Password">
         <button onclick="loadTeams()">Unlock</button>
     </div>
 
-    <div id="teamContainer" style="margin-top: 20px;"></div>
+    <div id="summary" class="summary" style="display:none;"></div>
+    <div id="teamContainer" class="table-wrap" style="margin-top: 20px;"></div>
 </div>
 
 <script>
+    const REFRESH_MS = 30000;
     let ADMIN_KEY = "";
+    let refreshTimer = null;
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    }
+
+    // 1790282200270 -> "Sep 24, 2:43:20 PM"
+    function clock(ms) {
+        if (!ms) return "—";
+        return new Date(ms).toLocaleString([], {
+            month: "short", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit"
+        });
+    }
+
+    // 192088 -> "3:12", 3725000 -> "1:02:05"
+    function duration(ms) {
+        if (ms == null || ms < 0) return "—";
+        const total = Math.round(ms / 1000);
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        const s = String(total % 60).padStart(2, "0");
+        return h ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
+    }
+
+    // Derive progress fields used for display and sorting
+    function describe(t) {
+        const stages = t.stages || {};
+        const solved = Object.keys(stages).map(Number).filter(n => stages[n]).sort((a, b) => a - b);
+        const last = solved.length ? solved[solved.length - 1] : 0;
+
+        let status, cls;
+        if (t.endTime) { status = "Finished"; cls = "finished"; }
+        else if (last) { status = `On stage ${last + 1}`; cls = "playing"; }
+        else { status = "Not started"; cls = "waiting"; }
+
+        // Time spent on each stage = time solved minus previous solve (or start)
+        let prev = t.startTime;
+        const splits = solved.map(n => {
+            const s = `S${n}: ${duration(stages[n] - prev)}`;
+            prev = stages[n];
+            return s;
+        });
+
+        const total = t.endTime ? t.endTime - t.startTime : null;
+        const elapsed = t.endTime ? null : Date.now() - t.startTime;
+        return { status, cls, splits, total, elapsed, solvedCount: solved.length };
+    }
 
     async function loadTeams() {
         ADMIN_KEY = document.getElementById("adminKey").value;
@@ -57,49 +147,88 @@
             return alert("Enter password");
         }
 
+        await refresh(true);
+    }
+
+    async function refresh(fromUnlock = false) {
         const res = await fetch("/secret/admin/teams", {
             headers: { "x-admin-key": ADMIN_KEY }
         });
 
         if (!res.ok) {
-            return alert("Wrong password");
+            if (fromUnlock) alert("Wrong password");
+            return;
         }
 
         const data = await res.json();
         renderTeams(data.teams);
+
+        document.getElementById("loginBox").style.display = "none";
+        clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(refresh, REFRESH_MS);
     }
 
     function renderTeams(teams) {
+        const rows = teams.map(t => ({ t, d: describe(t) }));
+
+        // Finished teams fastest-first, then everyone else by progress
+        rows.sort((a, b) => {
+            if (a.d.total != null && b.d.total != null) return a.d.total - b.d.total;
+            if (a.d.total != null) return -1;
+            if (b.d.total != null) return 1;
+            return b.d.solvedCount - a.d.solvedCount || a.t.startTime - b.t.startTime;
+        });
+
+        const finished = rows.filter(r => r.d.total != null).length;
+        const playing = rows.filter(r => r.d.cls === "playing").length;
+        const summary = document.getElementById("summary");
+        summary.style.display = "flex";
+        summary.innerHTML = `
+            <span><strong>${rows.length}</strong> teams</span>
+            <span><strong>${finished}</strong> finished</span>
+            <span><strong>${playing}</strong> in progress</span>
+            <span>Updated ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })} · refreshes every 30s</span>
+            <button class="btn-small" onclick="refresh()">Refresh now</button>
+        `;
+
+        let rank = 0;
         let html = `
         <table>
             <tr>
+                <th>#</th>
                 <th>Team</th>
                 <th>Contact</th>
                 <th>Route</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Stages</th>
+                <th>Status</th>
+                <th>Started</th>
+                <th>Finished</th>
+                <th>Total time</th>
+                <th>Stage times</th>
                 <th>Actions</th>
             </tr>
     `;
 
-        for (const t of teams) {
-            const stageList =
-                t.stages ? Object.entries(t.stages)
-                    .map(([s, time]) => `Stage ${s}: ${time}`)
-                    .join("<br>") : "None";
+        for (const { t, d } of rows) {
+            const place = d.total != null ? ++rank : "";
+            const totalCell = d.total != null
+                ? `<span class="total">${duration(d.total)}</span>`
+                : `<span title="Elapsed so far">${duration(d.elapsed)} so far</span>`;
+            const route = t.route ? t.route.replace("route", "Route ") : "?";
 
             html += `
             <tr>
-                <td>${t.teamName}</td>
-                <td>${t.contact}</td>
-                <td>${t.route || "?"}</td>
-                <td>${t.startTime}</td>
-                <td>${t.endTime ?? "null"}</td>
-                <td>${stageList}</td>
+                <td class="num">${place}</td>
+                <td>${escapeHtml(t.teamName)}</td>
+                <td>${escapeHtml(t.contact)}</td>
+                <td>${escapeHtml(route)}</td>
+                <td><span class="status ${d.cls}">${d.status}</span></td>
+                <td class="num">${clock(t.startTime)}</td>
+                <td class="num">${clock(t.endTime)}</td>
+                <td class="num">${totalCell}</td>
+                <td class="splits">${d.splits.join("<br>") || "—"}</td>
                 <td>
-                    <button class="btn-small" onclick="editTeam('${t.teamName}')">Edit</button>
-                    <button class="btn-small" onclick="deleteTeam('${t.teamName}')">Delete</button>
+                    <button class="btn-small" data-team="${escapeHtml(t.teamName)}" onclick="editTeam(this.dataset.team)">Edit</button>
+                    <button class="btn-small" data-team="${escapeHtml(t.teamName)}" onclick="deleteTeam(this.dataset.team)">Delete</button>
                 </td>
             </tr>
         `;
@@ -107,7 +236,7 @@
 
         html += "</table>";
 
-        document.getElementById("teamContainer").innerHTML = html;
+        document.getElementById("teamContainer").innerHTML = rows.length ? html : "<p>No teams yet.</p>";
     }
 
     function deleteTeam(teamName) {
@@ -125,7 +254,7 @@
             .then(d => {
                 if (d.error) return alert("Error: " + d.error);
                 alert("Team deleted");
-                loadTeams();
+                refresh();
             });
     }
 
@@ -151,7 +280,7 @@
             .then(d => {
                 if (d.error) return alert("Error: " + d.error);
                 alert("Updated");
-                loadTeams();
+                refresh();
             });
     }
 </script>

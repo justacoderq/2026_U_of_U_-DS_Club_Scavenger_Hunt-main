@@ -1,10 +1,9 @@
 /*
 Router for /api/ endpoint
 */
-import logEvent from '../utils/logger.js';
 import fs from 'fs';
-import path from 'path';
-import { TOKEN_MAP_PATH } from '../utils/config.js';
+import { TOKEN_MAP_PATH, PUZZLES_PATH } from '../utils/config.js';
+import { getTeam, saveTeam } from '../utils/teamStore.js';
 
 import express from 'express';
 const apiRouter = express.Router();
@@ -31,8 +30,7 @@ apiRouter.get('/start', (req, res) => {
 });
 
 
-const puzzlesPath = path.join(process.cwd(), 'puzzles.json');
-const puzzles = JSON.parse(fs.readFileSync(puzzlesPath, 'utf8'));
+const puzzles = JSON.parse(fs.readFileSync(PUZZLES_PATH, 'utf8'));
 
 // ==============================
 // API: Get Token Info (for interstitial)
@@ -58,7 +56,7 @@ apiRouter.get('/clue/:token', (req, res) => {
 });
 
 // ==============================
-// API: Get Puzzle (question + answer)
+// API: Get Puzzle (question + hint; the answer never leaves the server)
 // ==============================
 apiRouter.get('/puzzle/:route/:stage', (req, res) => {
     const route = Number(req.params.route);
@@ -75,8 +73,7 @@ apiRouter.get('/puzzle/:route/:stage', (req, res) => {
 
     res.json({
         question: puzzle.question,
-        hint: puzzle.hint,
-        answer: puzzle.answer
+        hint: puzzle.hint
     });
 });
 
@@ -84,7 +81,7 @@ apiRouter.get('/puzzle/:route/:stage', (req, res) => {
 // ==============================
 // API: Check Answer & Return Next Token
 // ==============================
-apiRouter.post('/checkAnswer', (req, res) => {
+apiRouter.post('/checkAnswer', async (req, res) => {
     const { route, stage, answer, team } = req.body;
 
     // Find puzzle
@@ -98,39 +95,31 @@ apiRouter.post('/checkAnswer', (req, res) => {
     }
 
     const correct =
-        puzzle.answer.trim().toLowerCase() === answer.trim().toLowerCase();
+        puzzle.answer.trim().toLowerCase() === String(answer ?? '').trim().toLowerCase();
 
     if (!correct) {
         return res.json({ correct: false });
     }
 
-    // Load teams.json
-    // Prefer persistent disk if it exists (Render)
-    const dataDir = process.env.RENDER ? "/var/data" : process.cwd();
-    const teamsPath = path.join(dataDir, "teams.json");
-    
-    // If the file doesn't exist on Render yet, create it (first deploy)
-    if (!fs.existsSync(teamsPath)) {
-        console.log("teams.json not found — creating new one:", teamsPath);
-        fs.writeFileSync(teamsPath, JSON.stringify({ teams: [] }, null, 2));
-    }
+    try {
+        const teamEntry = await getTeam(team);
 
-    let teamsData = JSON.parse(fs.readFileSync(teamsPath, "utf8"));
-    
-    const teamEntry = teamsData.teams.find(t => t.teamName === team);
-    
-    if (!teamEntry) {
-        return res.status(400).json({ error: "Team not registered" });
+        if (!teamEntry) {
+            return res.status(400).json({ error: "Team not registered" });
+        }
+
+        teamEntry.stages = teamEntry.stages || {};
+        teamEntry.stages[stage] = Date.now();
+
+        if (Number(stage) === 4) {
+            teamEntry.endTime = teamEntry.stages[stage];
+        }
+
+        await saveTeam(teamEntry);
+    } catch (err) {
+        console.error("Error saving progress:", err);
+        return res.status(500).json({ error: "Could not save progress" });
     }
-    
-    teamEntry.stages = teamEntry.stages || {};
-    teamEntry.stages[stage] = Date.now();
-    
-    if (Number(stage) === 4) {
-        teamEntry.endTime = teamEntry.stages[stage];
-    }
-    
-    fs.writeFileSync(teamsPath, JSON.stringify(teamsData, null, 2));
 
     // Find next token
     const next = Object.entries(tokenMap).find(([_, v]) =>
@@ -140,21 +129,6 @@ apiRouter.post('/checkAnswer', (req, res) => {
 
     res.json({
         correct: true,
-        nextToken: next ? next[0] : null
-    });
-});
-
-// ==============================
-// Dev Skip Endpoints TODO DELETE
-// ==============================
-apiRouter.get('/skip/:route/:stage', (req, res) => {
-    const { route, stage } = req.params;
-
-    const next = Object.entries(tokenMap).find(
-        ([_, v]) => v.route === route && v.stage === Number(stage) + 1
-    );
-
-    res.json({
         nextToken: next ? next[0] : null
     });
 });
