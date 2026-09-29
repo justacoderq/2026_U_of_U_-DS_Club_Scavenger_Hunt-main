@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("clueForm");
     const questionTitle = document.getElementById("question-title");
     const questionText = document.getElementById("question-text");
+    const questionVisual = document.getElementById("question-visual");
     const errorMsg = document.getElementById("errorMsg");
 
     const teamField = document.getElementById("teamName");
@@ -59,6 +60,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         questionTitle.textContent = `Question #${stage}`;
         questionText.textContent = puzzle.question;
+        if (puzzle.image) {
+            questionVisual.src = puzzle.image;
+            questionVisual.alt = `Visual for question ${stage}`;
+            questionVisual.hidden = false;
+        }
 
         // Hint
         const hintBtn = document.getElementById("hintBtn");

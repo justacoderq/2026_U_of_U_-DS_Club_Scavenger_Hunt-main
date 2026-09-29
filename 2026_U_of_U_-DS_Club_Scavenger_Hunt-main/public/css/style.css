@@ -130,6 +130,13 @@ main {
     font-size: 1.05rem;
 }
 
+.question-visual {
+    display: block;
+    width: min(100%, 640px);
+    height: auto;
+    margin: 1rem auto 0;
+}
+
 /* ==============================
    Team Setup Form
    ============================== */

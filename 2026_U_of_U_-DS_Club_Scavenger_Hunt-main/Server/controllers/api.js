@@ -73,7 +73,8 @@ apiRouter.get('/puzzle/:route/:stage', (req, res) => {
 
     res.json({
         question: puzzle.question,
-        hint: puzzle.hint
+        hint: puzzle.hint,
+        image: puzzle.image || null
     });
 });
 

@@ -3,7 +3,8 @@
     "route": 1,
     "stage": 1,
     "question": "Decide which curve shows underfitting",
-    "hint": "Compare train vs validation error and the gap between them",
+    "hint": "Underfitting keeps both training and validation error relatively high, with only a small gap between them.",
+    "image": "/assets/questions/underfitting-curves.png",
     "answer": "A"
   },
   {
@@ -39,6 +40,7 @@
     "stage": 2,
     "question": "Of the 4 plots on the poster, which has the largest positive correlation (1, 2, 3 or 4)",
     "hint": "Look for points tightly clustered along a positive slope",
+    "image": "/assets/questions/positive-correlation-plots.png",
     "answer": "1"
   },
   {
